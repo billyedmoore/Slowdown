@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/billyedmoore/Slowdown/parser"
 )
@@ -10,6 +11,19 @@ func main() {
 	lines := []string{"Line one", "Line two", "", "Second paragraph"}
 
 	root := parser.Parse(lines)
+	traverse(root, 0)
+}
 
-	fmt.Printf("%v\n", root)
+func traverse(node parser.Node, depth int) {
+	print(strings.Repeat("\t", depth))
+
+	fmt.Printf("Node: %v ", node.GetNodeType())
+	if len(node.GetContent()) > 0 {
+		fmt.Printf("Content: \"%v\"", node.GetContent())
+	}
+	print("\n")
+
+	for _, child := range node.GetChildren() {
+		traverse(child, depth+1)
+	}
 }

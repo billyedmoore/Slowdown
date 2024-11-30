@@ -1,9 +1,15 @@
 package parser
 
+import "fmt"
+
 type Node interface {
 	GetChildren() []Node
+	SetChildren([]Node)
+	AreChildrenBlocks() bool
 	IsLeaf() bool
+	GetContent() string // unsure about this because only RAWINLINETEXT should ever have content
 	GetNodeType() string
+	GetRoot() RootNode
 }
 
 // This means we can easily add requirements to these as and when we
@@ -26,17 +32,39 @@ func (node RootNode) GetChildren() []Node {
 	return node.children
 }
 
+func (node RootNode) SetChildren(newChildren []Node) {
+	copy(node.children, newChildren)
+}
+
 func (node RootNode) IsLeaf() bool {
 	return false
+}
+
+func (node RootNode) AreChildrenBlocks() bool {
+	return true
 }
 
 func (node RootNode) GetNodeType() string {
 	return "ROOT"
 }
 
+func (node RootNode) GetContent() string {
+	return ""
+}
+
+func (node RootNode) GetRoot() RootNode {
+	return node
+}
+
+//--INLINE NODES--
+
 type UnparsedInlineNode struct {
 	content string
 	root    RootNode
+}
+
+func (node UnparsedInlineNode) GetContent() string {
+	return node.content
 }
 
 func (node UnparsedInlineNode) GetChildren() []Node {
@@ -44,12 +72,58 @@ func (node UnparsedInlineNode) GetChildren() []Node {
 }
 
 func (node UnparsedInlineNode) IsLeaf() bool {
+	return true
+}
+
+func (node UnparsedInlineNode) AreChildrenBlocks() bool {
 	return false
 }
 
 func (node UnparsedInlineNode) GetNodeType() string {
 	return "UNPARSED_INLINE"
 }
+
+func (node UnparsedInlineNode) GetRoot() RootNode {
+	return node.root
+}
+func (node UnparsedInlineNode) SetChildren(newChildren []Node) {
+	fmt.Printf("TRYING TO SET THE CHILDREN OF A NODE WITHOUT CHILDREN\n")
+}
+
+type RawTextInlineNode struct {
+	content string
+	root    RootNode
+}
+
+func (node RawTextInlineNode) GetChildren() []Node {
+	return make([]Node, 0)
+}
+
+func (node RawTextInlineNode) IsLeaf() bool {
+	return true
+}
+
+func (node RawTextInlineNode) AreChildrenBlocks() bool {
+	return false
+}
+
+func (node RawTextInlineNode) GetNodeType() string {
+	return "RAW_TEXT_INLINE"
+}
+
+func (node RawTextInlineNode) GetContent() string {
+	return node.content
+}
+
+func (node RawTextInlineNode) GetRoot() RootNode {
+	return node.root
+}
+
+func (node RawTextInlineNode) SetChildren(newChildren []Node) {
+	fmt.Printf("TRYING TO SET THE CHILDREN OF A NODE WITHOUT CHILDREN\n")
+}
+
+//--BLOCK NODES
 
 type ParagraphNode struct {
 	children []Node
@@ -61,10 +135,25 @@ func (node ParagraphNode) GetChildren() []Node {
 }
 
 func (node ParagraphNode) IsLeaf() bool {
-	// All children must be InlineBlocks
-	return true
+	return false
+}
+
+func (node ParagraphNode) AreChildrenBlocks() bool {
+	return false
 }
 
 func (node ParagraphNode) GetNodeType() string {
 	return "PARAGRAPH_BLOCK"
+}
+
+func (node ParagraphNode) GetContent() string {
+	return ""
+}
+
+func (node ParagraphNode) GetRoot() RootNode {
+	return node.root
+}
+
+func (node ParagraphNode) SetChildren(newChildren []Node) {
+	copy(node.children, newChildren)
 }

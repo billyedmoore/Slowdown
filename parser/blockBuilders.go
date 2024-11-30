@@ -29,7 +29,7 @@ func (builder ParagraphBuilder) parse(start int, lines []string, root RootNode) 
 		end = len(lines)
 	}
 
-	newChildContent := strings.Join(lines[start:end], " ")
+	newChildContent := strings.Join(lines[start:end], "\n")
 	newChildNode := UnparsedInlineNode{content: newChildContent, root: root}
 
 	newNode := ParagraphNode{children: []Node{newChildNode}, root: root}
