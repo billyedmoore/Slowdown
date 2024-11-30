@@ -1,7 +1,5 @@
 package parser
 
-import "fmt"
-
 var blockNodeBuilders = []BlockNodeBuilder{ParagraphBuilder{}}
 var inlineNodeBuilders = []InlineNodeBuilder{RawTextBuilder{}}
 

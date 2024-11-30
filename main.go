@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/billyedmoore/Slowdown/parser"
@@ -19,7 +20,7 @@ func traverse(node parser.Node, depth int) {
 
 	fmt.Printf("Node: %v ", node.GetNodeType())
 	if len(node.GetContent()) > 0 {
-		fmt.Printf("Content: \"%v\"", node.GetContent())
+		fmt.Printf("Content: %v", strconv.Quote(node.GetContent()))
 	}
 	print("\n")
 
