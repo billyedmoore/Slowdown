@@ -63,11 +63,9 @@ func parseInline(contentAsString string, root RootNode) []Node {
 	content := []rune(contentAsString)
 	for i := 0; i < len(content); {
 		consumed := false
-		fmt.Printf("%v - %c\n", i, content[i])
 		for _, builder := range inlineNodeBuilders {
 			if builder.isValidStart(content[i]) {
 				new_i, node, err := builder.parse(i, string(content), root)
-				fmt.Printf("Jumping from %v to %v\n", i, new_i)
 				if err == nil {
 					consumed = true
 					result = append(result, node)
