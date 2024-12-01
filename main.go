@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	lines := []string{"Line one", "Line two", "", "Second paragraph"}
+	lines := []string{"Line one", "Line two", "# Heading", "Second paragraph"}
+	//lines := []string{"  #                    Line one        ", "", "Second paragraph"}
 
 	root := parser.Parse(lines)
 	traverse(root, 0)
