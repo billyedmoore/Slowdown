@@ -15,7 +15,6 @@ type ATXHeadingBuilder struct {
 }
 
 func (builder ATXHeadingBuilder) isValidStart(s string) bool {
-	// Pretty quick and dirty check if it sort of looks like an ATX header
 	allowedSpaces := 3
 	headingLevel := 0
 
@@ -103,16 +102,21 @@ func (builder ParagraphBuilder) isValidStart(s string) bool {
 
 func (builder ParagraphBuilder) parse(start int, lines []string, root RootNode) (int, BlockNode, error) {
 	var end int = -1
-	for i := start; i < len(lines); i++ {
-		atxBuilder := ATXHeadingBuilder{}
-		if atxBuilder.isValidStart(lines[i]) {
-			// This doesn't matter for atxHeadings but when other blocks that can
-			// break up paragraphs are here isValidStart won't mean it will sucessfully
-			// parse
-			_, _, err := atxBuilder.parse(i, lines, root)
-			if err == nil {
-				end = i
+
+	broken := false
+	for i := start; i < len(lines) && !broken; i++ {
+		for _, builder := range paragraphBreakingBuilders {
+			if broken {
 				break
+			}
+			if builder.isValidStart(lines[i]) {
+				// Check it doesn't fail to parse
+				_, _, err := builder.parse(i, lines, root)
+				if err == nil {
+					end = i
+					broken = true
+				} else {
+				}
 			}
 		}
 		if len(lines[i]) == 0 {
@@ -131,4 +135,52 @@ func (builder ParagraphBuilder) parse(start int, lines []string, root RootNode) 
 	newNode := ParagraphNode{children: []Node{newChildNode}, root: root}
 
 	return end, newNode, nil
+}
+
+type ThematicBreakBuilder struct {
+}
+
+func (builder ThematicBreakBuilder) isValidStart(s string) bool {
+	allowedSpaces := 3
+
+	// Check starts with 3 or less spaces
+	for _, c := range s {
+		if unicode.IsSpace(c) {
+			if allowedSpaces > 0 {
+				allowedSpaces -= 1
+			} else {
+				return false
+			}
+		} else {
+			break
+		}
+	}
+
+	s = strings.ReplaceAll(s, " ", "")
+
+	var c rune = '!'
+	count := 0
+
+	for _, char := range []rune(s) {
+		if c == '!' {
+			c = char
+		}
+
+		if c != char {
+			return false
+		} else {
+			count += 1
+		}
+	}
+
+	return count >= 3 && (c == '-' || c == '_' || c == '*')
+
+}
+
+func (builder ThematicBreakBuilder) parse(lineIndex int, lines []string, root RootNode) (int, BlockNode, error) {
+	if builder.isValidStart(lines[lineIndex]) {
+		return lineIndex + 1, ThematicBreakNode{root: root}, nil
+	} else {
+		return -1, nil, fmt.Errorf("Couldn't make thematic break.")
+	}
 }
