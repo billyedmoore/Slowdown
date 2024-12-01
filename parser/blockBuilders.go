@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"unicode"
+
+	"github.com/billyedmoore/Slowdown/utils"
 )
 
 type BlockNodeBuilder interface {
@@ -156,7 +158,7 @@ func (builder ThematicBreakBuilder) isValidStart(s string) bool {
 		}
 	}
 
-	s = strings.ReplaceAll(s, " ", "")
+	s = utils.RemoveWhitespace(s)
 
 	var c rune = '!'
 	count := 0
