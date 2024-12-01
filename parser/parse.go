@@ -1,6 +1,6 @@
 package parser
 
-var blockNodeBuilders = []BlockNodeBuilder{ParagraphBuilder{}}
+var blockNodeBuilders = []BlockNodeBuilder{ATXHeadingBuilder{}, ParagraphBuilder{}}
 var inlineNodeBuilders = []InlineNodeBuilder{RawTextBuilder{}}
 
 func Parse(lines []string) Node {

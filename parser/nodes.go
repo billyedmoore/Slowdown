@@ -157,3 +157,37 @@ func (node ParagraphNode) GetRoot() RootNode {
 func (node ParagraphNode) SetChildren(newChildren []Node) {
 	copy(node.children, newChildren)
 }
+
+type HeadingNode struct {
+	children     []Node
+	headingLevel int
+	root         RootNode
+}
+
+func (node HeadingNode) GetChildren() []Node {
+	return node.children
+}
+
+func (node HeadingNode) IsLeaf() bool {
+	return false
+}
+
+func (node HeadingNode) AreChildrenBlocks() bool {
+	return false
+}
+
+func (node HeadingNode) GetNodeType() string {
+	return "HEADING_BLOCK"
+}
+
+func (node HeadingNode) GetContent() string {
+	return ""
+}
+
+func (node HeadingNode) GetRoot() RootNode {
+	return node.root
+}
+
+func (node HeadingNode) SetChildren(newChildren []Node) {
+	copy(node.children, newChildren)
+}
