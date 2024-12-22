@@ -16,18 +16,18 @@ func RemoveWhitespace(s string) string {
 
 func DoesLineStartWithThreeOrLessSpaces(s string) bool {
 	// space as defined by the commonmark spec a single U+0020 char
-	allowedSpaces := 3
+	return HowManySpacesDoesLineStartWith(s) <= 3
+}
+
+func HowManySpacesDoesLineStartWith(s string) int {
+	spaces := 0
 
 	for _, c := range s {
 		if c == ' ' {
-			if allowedSpaces > 0 {
-				allowedSpaces -= 1
-			} else {
-				return false
-			}
+			spaces += 1
 		} else {
 			break
 		}
 	}
-	return true
+	return spaces
 }
