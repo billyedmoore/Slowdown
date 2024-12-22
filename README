@@ -19,6 +19,7 @@ Markdown parser written in go.
 + Setext Headings
 + Raw HTML Blocks
 + Link Table
++ Non-fenced code blocks
 + Inline 
 	+ Bold
 	+ Italics
