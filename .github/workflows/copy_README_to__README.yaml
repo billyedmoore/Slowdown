@@ -5,6 +5,8 @@ on:
       - README
 
 jobs:
+  permissions:
+    contents: write
   run:
     runs-on: [ubuntu-latest]
     steps:
