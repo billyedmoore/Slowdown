@@ -13,3 +13,21 @@ func RemoveWhitespace(s string) string {
 
 	return string(returnVal)
 }
+
+func DoesLineStartWithThreeOrLessSpaces(s string) bool {
+	// space as defined by the commonmark spec a single U+0020 char
+	return HowManySpacesDoesLineStartWith(s) <= 3
+}
+
+func HowManySpacesDoesLineStartWith(s string) int {
+	spaces := 0
+
+	for _, c := range s {
+		if c == ' ' {
+			spaces += 1
+		} else {
+			break
+		}
+	}
+	return spaces
+}

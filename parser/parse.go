@@ -1,9 +1,9 @@
 package parser
 
-var blockNodeBuilders = []BlockNodeBuilder{ATXHeadingBuilder{}, ThematicBreakBuilder{}, ParagraphBuilder{}}
+var blockNodeBuilders = []BlockNodeBuilder{FencedCodeBuilder{}, ATXHeadingBuilder{}, ThematicBreakBuilder{}, ParagraphBuilder{}}
 var inlineNodeBuilders = []InlineNodeBuilder{RawTextBuilder{}}
 
-var paragraphBreakingBuilders = []BlockNodeBuilder{ATXHeadingBuilder{}, ThematicBreakBuilder{}}
+var paragraphBreakingBuilders = []BlockNodeBuilder{FencedCodeBuilder{}, ATXHeadingBuilder{}, ThematicBreakBuilder{}}
 
 func Parse(lines []string) Node {
 	AST := parseBlocks(lines)
