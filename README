@@ -3,7 +3,7 @@
 Markdown parser written in go. 
 
 > [!NOTE]
-> This is deliberately presented as raw markdown see the formated version [here](_README.md).
+> This is deliberately presented as raw markdown see the formated version [here](https://github.com/billyedmoore/Slowdown/blob/main/_README.md).
 
 ## Supported Features
 
