@@ -1,0 +1,19 @@
+name: copy README
+on: 
+  push:
+    paths:
+      - README
+jobs:
+  run:
+    runs-on: [ubuntu-latest]
+    steps:
+    - name: Checkout 
+      uses: actions/checkout@v2
+      with:
+          ref: ${{ github.head_ref }}
+    - name: Copy
+      run: cp README _README.md
+    - name: Git Commit 
+      run: git add _README.md; git commit -m "[GITHUB ACTION] - Copied README -> _README"
+    - name: Git Push
+      run: git push
