@@ -223,3 +223,37 @@ func (node ThematicBreakNode) GetRoot() RootNode {
 func (node ThematicBreakNode) SetChildren(newChildren []Node) {
 	fmt.Printf("TRYING TO SET THE CHILDREN OF A NODE WITHOUT CHILDREN\n")
 }
+
+type CodeNode struct {
+	children   []Node
+	root       RootNode
+	infoString string
+}
+
+func (node CodeNode) GetChildren() []Node {
+	return node.children
+}
+
+func (node CodeNode) IsLeaf() bool {
+	return false
+}
+
+func (node CodeNode) AreChildrenBlocks() bool {
+	return false
+}
+
+func (node CodeNode) GetNodeType() string {
+	return "CODE_BLOCK"
+}
+
+func (node CodeNode) GetContent() string {
+	return ""
+}
+
+func (node CodeNode) GetRoot() RootNode {
+	return node.root
+}
+
+func (node CodeNode) SetChildren(newChildren []Node) {
+	copy(node.children, newChildren)
+}

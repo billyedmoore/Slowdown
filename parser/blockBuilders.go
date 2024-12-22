@@ -85,8 +85,6 @@ func (builder ATXHeadingBuilder) parse(lineIndex int, lines []string, root RootN
 
 	lineWithoutPrefix = strings.TrimSpace(lineWithoutPrefix)
 
-	// UNTESTED WHETHER THIS WORKS
-
 	newChildNode := UnparsedInlineNode{content: lineWithoutPrefix, root: root}
 
 	newNode := HeadingNode{children: []Node{newChildNode}, root: root, headingLevel: headingLevel}
@@ -98,7 +96,7 @@ type ParagraphBuilder struct {
 
 func (builder ParagraphBuilder) isValidStart(s string) bool {
 	// As long as the line isnt empty it can be the start of a
-	// paragraph (paragraph is the most simple case)
+	// paragraph (paragraph is the default case)
 	return (len(s) > 0)
 }
 
@@ -184,5 +182,130 @@ func (builder ThematicBreakBuilder) parse(lineIndex int, lines []string, root Ro
 		return lineIndex + 1, ThematicBreakNode{root: root}, nil
 	} else {
 		return -1, nil, fmt.Errorf("Couldn't make thematic break.")
+	}
+}
+
+// Check if string is valid fenced code block opening and return the
+// length of the opening fence if it is (else -1)
+func parseCodeBlockFence(s string, opening bool) (int, int, rune, error) {
+	if len(s) < 3 {
+		return -1, -1, rune(0), fmt.Errorf("Line shorter than 3 chars")
+	}
+
+	var indent int = utils.HowManySpacesDoesLineStartWith(s)
+
+	if indent > 3 {
+		return -1, -1, rune(0), fmt.Errorf("Line doesn't start with three or less spaces")
+	}
+	s = strings.TrimLeft(s, " ")
+	openingAsArr := []rune(s)
+
+	c := openingAsArr[0]
+
+	if c != '`' && c != '~' {
+		return -1, -1, rune(0), fmt.Errorf("First char isn't ` or ~")
+	}
+
+	if openingAsArr[1] != c || openingAsArr[2] != c {
+		return -1, -1, rune(0), fmt.Errorf("First 3 chars of fence aren't the same")
+	}
+
+	numberCharsInOpeningFence := 1
+	for numberCharsInOpeningFence < len(openingAsArr) {
+		if openingAsArr[numberCharsInOpeningFence] == c {
+			numberCharsInOpeningFence++
+		} else {
+			break
+		}
+	}
+
+	if !opening {
+		s = strings.TrimRightFunc(s, unicode.IsSpace)
+		if len(s) != numberCharsInOpeningFence {
+			return -1, -1, rune(0), fmt.Errorf("Closing fence cannot have info strings")
+		}
+	} else {
+		if c == '`' {
+			for _, char := range openingAsArr[numberCharsInOpeningFence:] {
+				if char == '`' {
+					return -1, -1, rune(0), fmt.Errorf("Cannot have ` in info string where ` is the fence char.")
+
+				}
+			}
+		}
+	}
+	return numberCharsInOpeningFence, indent, c, nil
+}
+
+func parseOpeningCodeBlockFence(s string) (int, int, rune, string, error) {
+	i, indentLength, c, err := parseCodeBlockFence(s, true)
+
+	if err != nil {
+		return -1, -1, rune(0), "", err
+	}
+
+	infoString := s[i:len(s)]
+
+	return i, indentLength, c, infoString, nil
+}
+
+func parseClosingCodeBlockFence(s string, openingFenceLength int, fenceChar rune) error {
+	i, _, c, err := parseCodeBlockFence(s, false)
+
+	if err != nil {
+		return err
+	}
+
+	if i < openingFenceLength {
+		return fmt.Errorf("Closing fence must be as long or longer than opening fence")
+	}
+
+	if c != fenceChar {
+		return fmt.Errorf("Closing fence and opening fence must be made of the same char")
+	}
+
+	return nil
+}
+
+type FencedCodeBuilder struct {
+}
+
+func (builder FencedCodeBuilder) isValidStart(s string) bool {
+	_, _, _, _, err := parseOpeningCodeBlockFence(s)
+	return err == nil
+}
+
+func (builder FencedCodeBuilder) parse(lineIndex int, lines []string, root RootNode) (int, BlockNode, error) {
+	fenceLength, indentLength, fenceChar, infoString, err := parseOpeningCodeBlockFence(lines[lineIndex])
+
+	if err != nil {
+		return -1, nil, fmt.Errorf("Invalid opening fence")
+	}
+
+	//closed := false
+
+	closingFenceIndex := lineIndex + 1
+	for closingFenceIndex < len(lines) {
+		err = parseClosingCodeBlockFence(lines[closingFenceIndex], fenceLength, fenceChar)
+		if err == nil {
+			//		closed = true
+			break
+		}
+		closingFenceIndex += 1
+	}
+
+	contentLines := lines[lineIndex+1 : closingFenceIndex]
+	unindentedLines := make([]string, len(contentLines))
+	for i, line := range contentLines {
+		spaces := utils.HowManySpacesDoesLineStartWith(line)
+		unindentedLines[i] = line[min(spaces, indentLength):]
+	}
+
+	content := RawTextInlineNode{root: root, content: strings.Join(unindentedLines, "\n")}
+	node := CodeNode{root: root, children: []Node{content}, infoString: infoString}
+	if false {
+		return -1, nil, fmt.Errorf("Code block not closed")
+	} else {
+		return closingFenceIndex + 1, node, nil
 	}
 }
