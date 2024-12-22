@@ -4,9 +4,10 @@ on:
     paths:
       - README
 
+permissions:
+  contents: write
+
 jobs:
-  permissions:
-    contents: write
   run:
     runs-on: [ubuntu-latest]
     steps:
