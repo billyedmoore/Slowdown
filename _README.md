@@ -1,6 +1,6 @@
 # Slowdown
 
-Markdown parser written in go.
+Markdown parser written in go. 
 
 > [!NOTE]
 > This is deliberately presented as raw markdown see the formated version [here](_README.md).
@@ -19,6 +19,7 @@ Markdown parser written in go.
 + Setext Headings
 + Raw HTML Blocks
 + Link Table
++ Non-fenced code blocks
 + Inline 
 	+ Bold
 	+ Italics
